@@ -1261,6 +1261,7 @@ class POSItems {
 
 		frappe.db.get_value("Item Group", {lft: 1, is_group: 1}, "name", (r) => {
 			this.parent_item_group = r.name;
+			this.parent_item_size = "e61ae06c9b"
 			this.make_dom();
 			this.make_fields();
 
@@ -1292,6 +1293,8 @@ class POSItems {
 				<div class="search-field">
 				</div>
 				<div class="item-group-field">
+				</div>
+				<div class="item-size-field">
 				</div>
 			</div>
 			<div class="items-wrapper">
@@ -1359,6 +1362,26 @@ class POSItems {
 			parent: this.wrapper.find('.item-group-field'),
 			render_input: true
 		});
+
+		this.item_size_field = frappe.ui.form.make_control({
+			df: {
+				fieldtype: 'Link',
+				label: 'Item Size',
+				options: 'Item Attribute Value',
+				//default: me.parent_item_size,
+				filters:{
+					parent:"المقاس"
+				},
+				onchange: () => {
+					const item_size = this.item_size_field.get_value();
+					if (item_size) {
+						this.filter_items({ item_size: item_size });
+					}
+				}
+			},
+			parent: this.wrapper.find('.item-size-field'),
+			render_input: true
+		});
 	}
 
 	init_clusterize() {
@@ -1396,10 +1419,10 @@ class POSItems {
 		this.clusterize.update(row_items);
 	}
 
-	filter_items({ search_term='', item_group=this.parent_item_group}={}) {
+	filter_items({ search_term='', item_group=this.parent_item_group, item_size=this.parent_item_size}={}) {
 		if (search_term) {
 			search_term = search_term.toLowerCase();
-
+			
 			// memoize
 			this.search_index = this.search_index || {};
 			if (this.search_index[search_term]) {
@@ -1414,7 +1437,7 @@ class POSItems {
 			return this.render_items(this.all_items);
 		}
 
-		this.get_items({search_value: search_term, item_group })
+		this.get_items({search_value: search_term, item_group, item_size})
 			.then(({ items, serial_no, batch_no, barcode }) => {
 				if (search_term && !barcode) {
 					this.search_index[search_term] = items;
@@ -1514,7 +1537,7 @@ class POSItems {
 		return template;
 	}
 
-	get_items({start = 0, page_length = 40, search_value='', item_group=this.parent_item_group}={}) {
+	get_items({start = 0, page_length = 40, search_value='', item_group=this.parent_item_group, item_size=this.parent_item_size}={}) {
 		if (!this.frm.doc.pos_profile)
 			return;
 
@@ -1527,6 +1550,7 @@ class POSItems {
 					start,
 					page_length,
 					price_list,
+					item_size,
 					item_group,
 					search_value,
 					pos_profile: this.frm.doc.pos_profile
