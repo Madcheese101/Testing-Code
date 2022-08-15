@@ -26,6 +26,9 @@ def get_items(start, page_length, price_list, item_size, item_group, search_valu
 	if search_value:
 		data = search_serial_or_batch_or_barcode_number(search_value)
 
+	# Value recieved check.
+	frappe.msgprint(item_size)
+	
 	item_size_value = frappe.db.get_value("Item Attribute Value", item_size, ['attribute_value'])
 
 	item_code = data.get("item_code") if data.get("item_code") else search_value
