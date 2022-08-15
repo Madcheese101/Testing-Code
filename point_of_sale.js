@@ -1368,7 +1368,7 @@ class POSItems {
 				fieldtype: 'Link',
 				label: 'Item Size',
 				options: 'Item Attribute Value',
-				//default: me.parent_item_size,
+				default: me.parent_item_size,
 				filters:{
 					parent:"المقاس"
 				},
@@ -1432,7 +1432,7 @@ class POSItems {
 				this.set_item_in_the_cart(items);
 				return;
 			}
-		} else if (item_group == this.parent_item_group) {
+		} else if (item_group == this.parent_item_group item_size == this.parent_item_size) {
 			this.items = this.all_items;
 			return this.render_items(this.all_items);
 		}

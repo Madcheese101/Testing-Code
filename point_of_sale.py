@@ -167,8 +167,6 @@ def search_serial_or_batch_or_barcode_number(search_value):
 
 def get_conditions(item_code, serial_no, batch_no, barcode, item_size):
 	
-	frappe.msgprint((item_size))
-
 	if serial_no or batch_no or barcode:
 		return "and i.name = {0}".format(frappe.db.escape(item_code))
 
