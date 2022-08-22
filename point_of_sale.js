@@ -1,4 +1,5 @@
 /* global Clusterize */
+// start
 frappe.provide('erpnext.pos');
 
 frappe.pages['point-of-sale'].on_page_load = function(wrapper) {
@@ -1333,8 +1334,9 @@ class POSItems {
 				const search_term = e.target.value;
 				const item_group = this.item_group_field ?
 					this.item_group_field.get_value() : '';
-
-				this.filter_items({ search_term:search_term,  item_group: item_group});
+				const item_size = this.item_size_field ?
+					this.item_size_field.get_value() : '';
+				this.filter_items({ search_term:search_term,  item_group: item_group, item_size: item_size});
 			}, 300);
 		});
 
@@ -1373,9 +1375,12 @@ class POSItems {
 					parent:"المقاس"
 				},
 				onchange: () => {
+					const search_term = this.search_field ?
+						this.search_field.get_value() : '';
 					const item_size = this.item_size_field.get_value();
+					
 					if (item_size) {
-						this.filter_items({ item_size: item_size });
+						this.filter_items({search_term:search_term, item_size: item_size, size_trigger: 1});
 					}
 				}
 			},
@@ -1419,10 +1424,10 @@ class POSItems {
 		this.clusterize.update(row_items);
 	}
 
-	filter_items({ search_term='', item_group=this.parent_item_group, item_size=this.parent_item_size}={}) {
-		if (search_term) {
+	filter_items({ search_term='', item_group=this.parent_item_group, item_size=this.parent_item_size, size_trigger = 0}={}) {
+		if (search_term && size_trigger == 0) {
 			search_term = search_term.toLowerCase();
-			
+
 			// memoize
 			this.search_index = this.search_index || {};
 			if (this.search_index[search_term]) {
@@ -1432,9 +1437,12 @@ class POSItems {
 				this.set_item_in_the_cart(items);
 				return;
 			}
-		} else if (item_group == this.parent_item_group && item_size == this.parent_item_size) {
+		} else if (item_group == this.parent_item_group && item_size==this.parent_item_size) {
 			this.items = this.all_items;
 			return this.render_items(this.all_items);
+		}
+		else if (search_term && size_trigger == 1){
+			search_term = search_term.toLowerCase();
 		}
 
 		this.get_items({search_value: search_term, item_group, item_size})
