@@ -1383,6 +1383,11 @@ class POSItems {
 						this.filter_items({search_term:search_term, item_size: item_size, size_trigger: 1});
 					}
 				}
+				,get_query: () => {
+					return {
+						query: 'erpnext.selling.page.point_of_sale.point_of_sale.item_size_query'
+					};
+				}
 			},
 			parent: this.wrapper.find('.item-size-field'),
 			render_input: true

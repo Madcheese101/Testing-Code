@@ -207,3 +207,16 @@ def item_group_query(doctype, txt, searchfield, start, page_len, filters):
 			where {condition} and (name like %(txt)s) limit {start}, {page_len}"""
 		.format(condition = cond, start=start, page_len= page_len),
 			{'txt': '%%%s%%' % txt})
+
+@frappe.whitelist()
+@frappe.validate_and_sanitize_search_inputs
+def item_size_query(doctype, txt, searchfield, start, page_len, filters):
+	cond = "1=1 and parent='المقاس'"
+	
+	#attribute_value
+	result = frappe.db.sql(""" select distinct name, attribute_value from `tabItem Attribute Value`
+			where {condition} and (name like %(txt)s) ORDER BY attribute_value ASC limit {start}, {page_len}"""
+		.format(condition = cond, start=start, page_len= page_len),
+			{'txt': '%%%s%%' % txt})
+
+	return result
