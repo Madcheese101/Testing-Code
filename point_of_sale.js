@@ -1262,7 +1262,7 @@ class POSItems {
 
 		frappe.db.get_value("Item Group", {lft: 1, is_group: 1}, "name", (r) => {
 			this.parent_item_group = r.name;
-			this.parent_item_size = "e61ae06c9b"
+			this.parent_item_size = "";
 			this.make_dom();
 			this.make_fields();
 
