@@ -36,7 +36,7 @@ def get_items(start, page_length, price_list, item_size, item_group, search_valu
 	batch_no = data.get("batch_no") if data.get("batch_no") else ""
 	barcode = data.get("barcode") if data.get("barcode") else ""
 
-	condition = get_conditions(item_code, serial_no, batch_no, barcode, item_size_value)
+	condition = get_conditions(item_code, serial_no, batch_no, barcode)
 
 	if pos_profile:
 		condition += get_item_group_condition(pos_profile)
@@ -46,8 +46,9 @@ def get_items(start, page_length, price_list, item_size, item_group, search_valu
 
 	bin_join = bin_cond = ""
 	if hide_unavailable_items:
-		bin_join = ",`tabBin` b"
-		bin_cond = "and i.item_code = b.item_code and ifnull(b.actual_qty, 0) > 0 "
+		bin_join = ",`tabBin` b , `tabItem Variant Attribute` c"
+		bin_cond = (""" and i.item_code = b.item_code and ifnull(b.actual_qty, 0) > 0 
+					   and i.item_code = c.parent and c.attribute_value like {item_size}""").format(item_size=frappe.db.escape('%' + item_size_value + '%'))
 		if warehouse:
 			bin_cond += "and b.warehouse = {}".format(frappe.db.escape(warehouse))
 
@@ -69,6 +70,7 @@ def get_items(start, page_length, price_list, item_size, item_group, search_valu
 				AND i.is_sales_item = 1
 				AND i.item_group in (SELECT name FROM `tabItem Group` WHERE lft >= {lft} AND rgt <= {rgt})
 				{condition} {bin_cond}
+		Group by i.item_code
 		ORDER BY
 			idx desc
 		LIMIT
@@ -168,15 +170,11 @@ def search_serial_or_batch_or_barcode_number(search_value):
 
 	return {}
 
-def get_conditions(item_code, serial_no, batch_no, barcode, item_size):
+def get_conditions(item_code, serial_no, batch_no, barcode):
 	
 	if serial_no or batch_no or barcode:
 		return "and i.name = {0}".format(frappe.db.escape(item_code))
 
-	if item_size:
-		return ("""and (i.name like {item_code} or i.item_name like {item_code}) and i.item_name like {item_size}"""
-				.format(item_code=frappe.db.escape('%' + item_code + '%'),item_size=frappe.db.escape('%' + item_size + '%')))
-	
 	return ("""and (i.name like {item_code} or i.item_name like {item_code})"""
 				.format(item_code=frappe.db.escape('%' + item_code + '%')))
 
