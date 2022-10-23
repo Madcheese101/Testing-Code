@@ -1379,9 +1379,8 @@ class POSItems {
 						this.search_field.get_value() : '';
 					const item_size = this.item_size_field.get_value();
 					
-					if (item_size) {
-						this.filter_items({search_term:search_term, item_size: item_size, size_trigger: 1});
-					}
+					this.filter_items({search_term:search_term, item_size: item_size, size_trigger: 1});
+					
 				}
 				,get_query: () => {
 					return {
