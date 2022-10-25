@@ -1348,9 +1348,12 @@ class POSItems {
 				default: me.parent_item_group,
 				onchange: () => {
 					const item_group = this.item_group_field.get_value();
-					if (item_group) {
-						this.filter_items({ item_group: item_group });
-					}
+					const item_size = this.item_size_field ?
+					this.item_size_field.get_value() : '';
+					this.filter_items({ item_group: item_group , item_size: item_size});
+					// if (item_group) {
+					// 	this.filter_items({ item_group: item_group , item_size: item_size});
+					// }
 				},
 				get_query: () => {
 					return {
@@ -1378,8 +1381,9 @@ class POSItems {
 					const search_term = this.search_field ?
 						this.search_field.get_value() : '';
 					const item_size = this.item_size_field.get_value();
-					
-					this.filter_items({search_term:search_term, item_size: item_size, size_trigger: 1});
+					const item_group = this.item_group_field ?
+					this.item_group_field.get_value() : '';
+					this.filter_items({search_term:search_term,item_group:item_group, item_size: item_size, size_trigger: 1});
 					
 				}
 				,get_query: () => {
@@ -1441,7 +1445,7 @@ class POSItems {
 				this.set_item_in_the_cart(items);
 				return;
 			}
-		} else if (item_group == this.parent_item_group && item_size==this.parent_item_size) {
+		} else if (item_group == this.parent_item_group && item_size==this.parent_item_size && search_term == "") {
 			this.items = this.all_items;
 			return this.render_items(this.all_items);
 		}
